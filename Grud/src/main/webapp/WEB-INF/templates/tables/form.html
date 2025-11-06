@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:with="lang=${#locale.language}" th:lang="${lang}">
+
+<head th:replace="layouts/main :: htmlhead"/>
+
+<body>
+
+<div th:replace="layouts/main :: navigation" />
+
+<div class="container">
+    <div class="row">
+        <div class="col text-center">
+            <h1 class="mt-5" th:text="${table.id != null} ? 'Edit Table' : 'New Table'">New Table</h1>
+            <p class="lead" th:text="${table.id != null} ? 'Update table details' : 'Add a new table to the restaurant'"></p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <form th:method="${table.id != null} ? 'POST' : 'POST'"
+          th:action="${table.id != null} ? @{/tables/{id}/update(id=${table.id})} : @{/tables}"
+          th:object="${table}">
+        <input type="hidden" th:field="*{id}" th:value="*{getId()}">
+
+        <div class="form-row">
+            <div class="col-md-6 mb-3">
+                <label for="tableNumber">Table Number</label>
+                <input type="text" class="form-control" id="tableNumber" th:field="*{tableNumber}"
+                       placeholder="Enter table number" required>
+                <div th:if="${#fields.hasErrors('tableNumber')}" th:errors="*{tableNumber}"/>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="capacity">Capacity</label>
+                <input type="number" class="form-control" id="capacity" th:field="*{capacity}"
+                       placeholder="Enter capacity" min="1" max="50" required>
+                <div th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}"/>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="col-md-6 mb-3">
+                <label for="tableType">Table Type</label>
+                <select class="form-control" id="tableType" th:field="*{tableType}" required>
+                    <option th:each="type : ${T(web.model.TableType).values()}"
+                            th:value="${type}"
+                            th:text="${type}">Table Type</option>
+                </select>
+                <div th:if="${#fields.hasErrors('tableType')}" th:errors="*{tableType}"/>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="locationDescription">Location Description</label>
+                <input type="text" class="form-control" id="locationDescription" th:field="*{locationDescription}"
+                       placeholder="e.g., Near window, Terrace, etc.">
+                <div th:if="${#fields.hasErrors('locationDescription')}" th:errors="*{locationDescription}"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="isAvailable" th:field="*{isAvailable}">
+                <label class="form-check-label" for="isAvailable">
+                    Table is available for reservations
+                </label>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit" th:text="${table.id != null} ? 'Update Table' : 'Create Table'"/>
+        <a class="btn btn-light border-dark" th:href="@{/tables}">Cancel</a>
+    </form>
+</div>
+
+<div th:replace="layouts/main :: footer"></div>
+</body>
+</html>

@@ -44,7 +44,7 @@ public class AppConfig {
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean(); // HibernateExceptions, PersistenceExceptions... to DataAccessException
         em.setDataSource(dataSource());
-        em.setPackagesToScan("web.model");
+        em.setPackagesToScan("web.model", "web.repository", "web.service");
         em.setJpaVendorAdapter(vendorAdapter);
         return em;
     }

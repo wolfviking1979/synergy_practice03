@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:with="lang=${#locale.language}" th:lang="${lang}">
+
+<head th:replace="layouts/main :: htmlhead"/>
+
+<body>
+
+<div th:replace="layouts/main :: navigation" />
+
+<div class="container">
+    <div class="row">
+        <div class="col text-center">
+            <h1 class="mt-5" th:text="${reservation.id != null} ? 'Edit Reservation' : 'New Reservation'">New Reservation</h1>
+            <p class="lead" th:text="${reservation.id != null} ? 'Update reservation details' : 'Create a new table reservation'"></p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <form th:method="${reservation.id != null} ? 'POST' : 'POST'"
+          th:action="${reservation.id != null} ? @{/reservations/{id}/update(id=${reservation.id})} : @{/reservations}"
+          th:object="${reservation}">
+        <input type="hidden" th:field="*{id}" th:value="*{getId()}">
+
+        <!-- Search for available tables -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Search Available Tables</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="col-md-4 mb-3">
+                        <label for="reservationDateTime">Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="reservationDateTime"
+                               name="reservationDateTime" th:value="*{getReservationDateTime() != null} ?
+                               ${#temporals.format(reservation.reservationDateTime, 'yyyy-MM-dd\'T\'HH:mm')} : ''"
+                               required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="numberOfGuests">Number of Guests</label>
+                        <input type="number" class="form-control" id="numberOfGuests" name="numberOfGuests"
+                               th:value="*{getNumberOfGuests()}" min="1" max="20" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="tableType">Table Type</label>
+                        <select class="form-control" id="tableType" name="tableType">
+                            <option value="">Any Type</option>
+                            <option th:each="type : ${tableTypes}"
+                                    th:value="${type}"
+                                    th:text="${type}">Table Type</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-3 d-flex align-items-end">
+                        <button type="submit" formaction="@{/reservations/search-available-tables}"
+                                class="btn btn-info">Search Tables</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Customer Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="col-md-4 mb-3">
+                        <label for="customerName">Full Name</label>
+                        <input type="text" class="form-control" id="customerName" th:field="*{customerName}"
+                               placeholder="Enter customer name" required>
+                        <div th:if="${#fields.hasErrors('customerName')}" th:errors="*{customerName}"/>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="customerPhone">Phone Number</label>
+                        <input type="text" class="form-control" id="customerPhone" th:field="*{customerPhone}"
+                               placeholder="Enter phone number" required>
+                        <div th:if="${#fields.hasErrors('customerPhone')}" th:errors="*{customerPhone}"/>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="customerEmail">Email</label>
+                        <input type="email" class="form-control" id="customerEmail" th:field="*{customerEmail}"
+                               placeholder="Enter email">
+                        <div th:if="${#fields.hasErrors('customerEmail')}" th:errors="*{customerEmail}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reservation Details -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Reservation Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="col-md-6 mb-3">
+                        <label for="table">Select Table</label>
+                        <select class="form-control" id="table" th:field="*{table}" required>
+                            <option value="">Select a table</option>
+                            <option th:each="table : ${availableTables != null ? availableTables : tables}"
+                                    th:value="${table.id}"
+                                    th:text="${table.tableNumber} + ' (' + ${table.capacity} + ' persons, ' + ${table.tableType} + ')'"
+                                    th:selected="${reservation.table != null and reservation.table.id == table.id}">
+                            </option>
+                        </select>
+                        <div th:if="${#fields.hasErrors('table')}" th:errors="*{table}"/>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="specialRequests">Special Requests</label>
+                        <textarea class="form-control" id="specialRequests" th:field="*{specialRequests}"
+                                  rows="3" placeholder="Any special requests..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit" th:text="${reservation.id != null} ? 'Update Reservation' : 'Create Reservation'"/>
+        <a class="btn btn-light border-dark" th:href="@{/reservations}">Cancel</a>
+    </form>
+</div>
+
+<div th:replace="layouts/main :: footer"></div>
+</body>
+</html>

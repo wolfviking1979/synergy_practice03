@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="Ru">
+
+<head th:replace="layouts/main :: htmlhead"/>
+
+<body>
+
+<div th:replace="layouts/main :: navigation" />
+
+<div class="container">
+    <div class="row">
+        <div class="col text-center">
+            <h1 class="mt-5">Restaurant Reservations</h1>
+            <p class="lead">Manage your table reservations</p>
+        </div>
+    </div>
+</div>
+
+<div class="container pl-0">
+    <div class="row pb-3 pt-3 mb-2 pl-0 ml-0">
+        <div class="col-12 pl-0">
+            <a type="button" th:href="@{/reservations/new}" class="btn btn-primary">Create new reservation</a>
+            <a type="button" th:href="@{/reservations/upcoming}" class="btn btn-secondary">Upcoming Reservations</a>
+
+            <!-- Form for searching by phone -->
+            <form th:action="@{/reservations/search}" method="get" class="form-inline d-inline-block ml-3">
+                <input type="text" name="phone" class="form-control" placeholder="Search by phone" required>
+                <button type="submit" class="btn btn-info ml-2">Search</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container" th:remove="${reservations.size() == 0} ? all">
+    <div class="row p-3 mb-2 bg-dark text-white">
+        <div class="col">Customer</div>
+        <div class="col">Phone</div>
+        <div class="col">Date & Time</div>
+        <div class="col">Table</div>
+        <div class="col">Guests</div>
+        <div class="col">Status</div>
+        <div class="col text-center">Actions</div>
+    </div>
+
+    <div th:each="reservation,rowStat : ${reservations}"
+         class="d-flex align-items-center row p-2 mb-2"
+         th:classappend="${rowStat.count % 2 != 0 ? 'bg-light text-dark' : 'bg-secondary text-white'}">
+        <div class="col font-weight-bold" th:text="${reservation.customerName}"/>
+        <div class="col" th:text="${reservation.customerPhone}"/>
+        <div class="col" th:text="${#temporals.format(reservation.reservationDateTime, 'dd/MM/yyyy HH:mm')}"/>
+        <div class="col" th:text="${reservation.table.tableNumber} + ' (' + ${reservation.table.capacity} + ')'"/>
+        <div class="col" th:text="${reservation.numberOfGuests}"/>
+        <div class="col">
+            <span th:switch="${reservation.status}" class="badge"
+                  th:classappend="${reservation.status == 'PENDING'} ? 'badge-warning' :
+                                 ${reservation.status == 'CONFIRMED'} ? 'badge-success' :
+                                 ${reservation.status == 'CANCELLED'} ? 'badge-danger' : 'badge-secondary'">
+                <th:block th:text="${reservation.status}"/>
+            </span>
+        </div>
+        <div class="col text-center">
+            <a type="button" th:href="@{/reservations/{id}/edit(id=${reservation.id})}"
+               class="btn btn-sm btn-outline-primary">Edit</a>
+            <th:block th:if="${reservation.status == 'PENDING'}">
+                <a type="button" th:href="@{/reservations/{id}/confirm(id=${reservation.id})}"
+                   class="btn btn-sm btn-outline-success">Confirm</a>
+            </th:block>
+            <th:block th:if="${reservation.status != 'CANCELLED'}">
+                <a type="button" th:href="@{/reservations/{id}/cancel(id=${reservation.id})}"
+                   class="btn btn-sm btn-outline-danger">Cancel</a>
+            </th:block>
+        </div>
+    </div>
+</div>
+
+<div class="container" th:remove="${reservations.size() != 0} ? all">
+    <div class="row p-3 mb-2 bg-light text-dark">
+        <div class="col-12">No reservations found.</div>
+    </div>
+</div>
+
+<div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
+    <div class="toast" style="position: fixed; top: 10rem; right: 10rem;" data-delay="3000">
+        <div class="toast-header">
+            <strong class="mr-auto">Restaurant Info</strong>
+            <small>Just now</small>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body" th:text="${flashMessage}"></div>
+    </div>
+</div>
+
+<div th:replace="layouts/main :: footer"></div>
+</body>
+</html>

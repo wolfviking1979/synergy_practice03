@@ -10,16 +10,21 @@
 <div class="container">
     <div class="row">
         <div class="col text-center">
-            <h1 class="mt-5">CRUD App</h1>
-            <p class="lead">Практическая задача</p>
+            <h1 class="mt-5">Restaurant Reservation System</h1>
+            <p class="lead">Управление бронированиями столиков</p>
             <ul class="list-unstyled">
                 <li>Spring MVC</li>
                 <li>Hibernate</li>
+                <li>Bootstrap</li>
             </ul>
         </div>
     </div>
     <div class="row">
-        <div class="col text-center"><a type="button" th:href="@{/users}" class="btn btn-secondary bg-secondary text-white">Get user list</a></div>
+        <div class="col text-center">
+            <a type="button" th:href="@{/reservations/new}" class="btn btn-primary">Новое бронирование</a>
+            <a type="button" th:href="@{/reservations}" class="btn btn-secondary">Список бронирований</a>
+            <a type="button" th:href="@{/tables}" class="btn btn-info">Управление столиками</a>
+        </div>
     </div>
 </div>
 
